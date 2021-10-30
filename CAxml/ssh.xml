@@ -4,6 +4,8 @@
 <PluginURL>https://raw.githubusercontent.com/docgyver/unraid-v6-plugins/master/ssh.plg</PluginURL>
 <PluginAuthor>DocGyver</PluginAuthor>
 <Beta>False</Beta>
+<DonateText>If you find this useful and would like to send me a gratuity</DonateText>
+<DonateLink>https://www.paypal.me/ToddPike</DonateLink>
 <Category>Network:Other Security:</Category>
 <Name>SSH Config Tool</Name>
 <Description>
