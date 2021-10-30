@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "ssh">
 <!ENTITY author     "docgyver">
-<!ENTITY version    "2019.11.26">
+<!ENTITY version    "2021.10.30">
 <!ENTITY category   "Network Services">
 <!ENTITY pluginURL  "https://raw.github.com/docgyver/unraid-v6-plugins/master/&name;.plg">
 <!ENTITY packageURL "https://github.com/docgyver/unraid-v6-plugins/releases/download/&name;">
@@ -15,8 +15,10 @@
          version="&version;"
          category="&category;"
          pluginURL="&pluginURL;">
-	
+
 <CHANGES>
+###2021.10.30###
+- Added code to check for unRaid 6.9 and modify behavior
 ###2019.11.26###
 - BugFix: Fixed Display of Online Version in the UI
 - BugFix: Move ssh.cfg initialization to buttonstart() from write_config(). Was causing UI changes to be ignored.
@@ -151,7 +153,7 @@ exec($command, $useropts);
 
 //create array of users from cfg file. explode handles comma separated in case of multi values
 $selectedsshusers  = explode(',', $ssh_cfg['USERLIST']);
-      
+
 //get version of SSH.  Note: ssh reports version to stderr, so redirect stderr (2) to stdout (1)
 $sshversion = shell_exec("/usr/bin/ssh -V 2>&1");
 
@@ -171,17 +173,17 @@ $sshversion = shell_exec("/usr/bin/ssh -V 2>&1");
       <?endif;?>
     </span>
   </div>
-  
+
   <div style="border: 0px solid black;">
     <span class="left">
       <p>
-        OpenSSH Application Version: <span class="green-text"><b><?=$sshversion?></b></span>   
+        OpenSSH Application Version: <span class="green-text"><b><?=$sshversion?></b></span>
       </p>
 	</span>
   </div>
 
   <br></br>
-  
+
   <div style="border: 0px solid black;">
     <table>
       <tr style="font-weight:bold; color:#333333; background:#F0F0F0; text-shadow:0 1px 1px #FFFFFF;">
@@ -258,7 +260,7 @@ $sshversion = shell_exec("/usr/bin/ssh -V 2>&1");
   <!--note to self: the /return/ in the onsubmit event is important as without it, the submit action is still processed-->
     <input type="hidden" name="cmd" value="/plugins/ssh/scripts/rc.ssh">
     <input type="hidden" name="arg3" id="arg3" maxlength="60" value="wibble">
- 
+
     <table class="settings">
       <tr>
       <td>Enable SSH Service:</td>
@@ -334,7 +336,7 @@ $sshversion = shell_exec("/usr/bin/ssh -V 2>&1");
 
     <div align="center">
       <hr size="3" align="center" width="75%" color="grey" style="margin-top:20px;margin-bottom:18px">
-      <input type="submit" name="runCmd" value="Apply"><button type="button" onClick="done();">Done</button>      
+      <input type="submit" name="runCmd" value="Apply"><button type="button" onClick="done();">Done</button>
     </div>
   </form>
   <br></br>
@@ -359,7 +361,7 @@ function validateForm() {
   if (document.getElementById('arg3').value == "") {
 	document.getElementById('arg3').value = "-1"
   }
-  
+
   document.getElementById('arg2').disabled = false;
   document.getElementById('arg3').disabled = false;
   document.getElementById('arg4').disabled = false;
@@ -372,7 +374,7 @@ function validateForm() {
 
 function checkRUNNING(form) {
     // dont disable arg1 which is the service enable/disable. only disable subsequent fields
-    // note: "disabled" elements do not get submitted. the below will cause these field values to be empty upon apply. a workaround is to 
+    // note: "disabled" elements do not get submitted. the below will cause these field values to be empty upon apply. a workaround is to
     //       implement a validation function which is called upon form submit which amongst other things can re-enable the fields
     if ("<?=$ssh_running;?>" == "yes") {
     form.arg2.disabled = true;
@@ -405,6 +407,15 @@ CONFIG="/boot/config/plugins/ssh/ssh.cfg"
 # read our configuration
 source $CONFIG
 
+# get unraid Version
+read verMajor verMinor verPatch < \
+    <(source /etc/unraid-version ; echo $version | sed 's/\./ /g')
+# set version specific flags
+# Greater than 6.9?
+  [ $verMajor -gt 6 ] || [ $verMajor -eq 6 -a $verMinor -ge 9 ]
+  unraid69=$((1-$?))  # change return code so 1 is true
+
+
 ssh_start()
 {
   # no-op if not enabled
@@ -413,41 +424,41 @@ ssh_start()
     #sleep 1
     return
   fi
-   
+
   # no-op if already running
   if [ -f /var/run/sshd.pid ]; then
     #echo "SSH already running"
     #sleep 1
     return
-  fi   
-   
+  fi
+
   echo "Starting SSH..."
   sleep 1
 
   /usr/sbin/sshd
-  
+
   echo "... OK"
   sleep 1
 }
 
 ssh_stop()
-{ 
+{
   # no-op if already running
   if [ ! -f /var/run/sshd.pid ]; then
     #echo "SSH already stopped"
     #sleep 1
     return
-  fi   
+  fi
 
   echo "Stopping SSH..."
   sleep 1
-  
+
   killall sshd
-  
+
   echo "... OK"
   sleep 1
 }
-  
+
 ssh_restart() {
   if [ -r /var/run/sshd.pid ]; then
     echo "Restarting parent listener process only. To kill every sshd process, you must use stop"
@@ -460,7 +471,7 @@ ssh_restart() {
   fi
   sleep 1
   ssh_start
-}  
+}
 
 ssh_buttonstart()
 {
@@ -482,7 +493,7 @@ write_config()
 {
   echo "Updating Config..."
   sleep 1
-  
+
   echo "# ssh configuration" > /boot/config/plugins/ssh/ssh.cfg
   echo "SERVICE=\"$SERVICE\"" >> /boot/config/plugins/ssh/ssh.cfg
   echo "PORT=\"$PORT\"" >> /boot/config/plugins/ssh/ssh.cfg
@@ -492,7 +503,7 @@ write_config()
   echo "PASSWORDAUTHENTICATION=\"$PASSWORDAUTHENTICATION\"" >> /boot/config/plugins/ssh/ssh.cfg
   echo "PERMITEMPTYPASSWORDS=\"$PERMITEMPTYPASSWORDS\"" >> /boot/config/plugins/ssh/ssh.cfg
   echo "GATEWAYPORTS=\"$GATEWAYPORTS\"" >> /boot/config/plugins/ssh/ssh.cfg
-  
+
   # only loop thru userlist if some/one were selected in webgui.  no users selected = -1
   if [[ $USERLIST != "-1" ]]; then
     # Account for fact $USERLIST is one or many comma separated user names
@@ -501,9 +512,9 @@ write_config()
     do
       USERTEMP=${USERLOOP%%\,*}
       USERLOOP=${USERLOOP#*\,}
-      
+
       #echo "Iterating through user: $USERTEMP"
-      
+
       # Create home directory + .ssh subdirectoy and assign same + shell to user
       if [ ! -d /home/$USERTEMP ]; then
         #echo "Creating home dir: {/home/$USERTEMP} for $USERTEMP..."
@@ -511,13 +522,13 @@ write_config()
       fi
       chown -R $USERTEMP:users /home/$USERTEMP
       chmod -R 0755 /home/$USERTEMP
-      
+
       #echo "Assigning shell {/bin/bash} & home dir: {/home/$USERTEMP} to user $USERTEMP..."
       usermod -d /home/$USERTEMP -s /bin/bash $USERTEMP 2>/dev/null
 
       # Check for existance of "authorised_keys" file at /boot/config/plugin/ssh/{someuser}.  Copy to /home/{someuser} if found.  Enables
       # user to authenticate with private / public key pair.
-      # NB: if file is not found, an empty directory path will be created on the flash drive, thus making it slightly easier for unraid user 
+      # NB: if file is not found, an empty directory path will be created on the flash drive, thus making it slightly easier for unraid user
       # to see what/where to maintain key files
       # ** IT IS CURRENTLY THE USERS RESPONSIBILITY TO PRE-GENERATE A PUBLIC/PRIVATE KEYPAIR **
       if [ -f /boot/config/plugins/ssh/$USERTEMP/.ssh/authorized_keys ]; then
@@ -531,33 +542,23 @@ write_config()
         cp /boot/config/plugins/ssh/read_me.txt /boot/config/plugins/ssh/$USERTEMP/.ssh/read_me.txt 2>/dev/null
       fi
     done
-  fi 
-  
-  # check if PermitRootLogin came thru as "YES", in which case check for authorized_keys file in plugin sub-dir.
-  if [[ $PERMITROOTLOGIN = "yes" ]]; then
-    [ ! -d /root/.ssh ] && mkdir /root/.ssh
-    if [ -f /boot/config/plugins/ssh/root/.ssh/authorized_keys ]; then
-	  cp --preserve=timestamps -p /boot/config/plugins/ssh/root/.ssh/authorized_keys /root/.ssh/authorized_keys
-      chmod 700 /root/.ssh
-      chmod 600 /root/.ssh/authorized_keys
-      chown root:root /root/.ssh/authorized_keys  
-	fi  
   fi
- 
-  # the host keys get created during plugin install script and if not present are generated
-  # using ssh-keygen and copied to flash to persist reboot.  we already know they're present
-  # at /boot/config/plugins/ssh so just copy them over to /etc/ssh and set correct perms
-  # this is a global setting, not user specific, so do it regardless if sshuser empty or not
-  # this way it will allow root to login via ssh as long as PermitRootLogin=yes and either
-  # root has been assigned a password or if no password then AllowEmptyPaswords must = yes
-  #cp --preserve=timestamps -p /boot/config/plugins/ssh/ssh_host_*key* /etc/ssh
-  #chmod 600 /etc/ssh/ssh_host_*key
-  #chmod 644 /etc/ssh/ssh*.pub
 
-  # do the same for sshd_config and ssh_config.  allows users to manually edit sshd_config on the flash drive in case additional config needed.
-  #cp --preserve=timestamps -p -f /boot/config/plugins/ssh/sshd_config /etc/ssh/sshd_config
-  #cp --preserve=timestamps -p -f /boot/config/plugins/ssh/ssh_config /etc/ssh/ssh_config
-  
+  # Pre Unraid 6.9 behavior. Ver6.9+ handles root user .ssh folder
+  if [[ $unraid69 != 1 ]]; then
+    # check if PermitRootLogin came thru as "YES", in which case check for authorized_keys file in plugin sub-dir.
+    if [[ $PERMITROOTLOGIN = "yes" ]]; then
+      [ ! -d /root/.ssh ] && mkdir /root/.ssh
+      if [ -f /boot/config/plugins/ssh/root/.ssh/authorized_keys ]; then
+  	    cp --preserve=timestamps -p /boot/config/plugins/ssh/root/.ssh/authorized_keys /root/.ssh/authorized_keys
+        chmod 700 /root/.ssh
+        chmod 600 /root/.ssh/authorized_keys
+        chown root:root /root/.ssh/authorized_keys
+      fi
+    fi
+  fi
+
+
   # update sshd_config file with values set in webgui
   # only update when the Keyword is find at the beginning of the line (^#\?)
   sed -i 's/^#\?Port .*/Port '$PORT'/' /etc/ssh/sshd_config
@@ -569,7 +570,7 @@ write_config()
 
   # preserve live /etc/sshd_config file on flash. When unRAID reboots, the standard ssh startup baked into unRAID v6 will
   # copy all files from /boot/config/ssh to /etc/ssh. This ensures the correct config is maintained after a reboot. Failure
-  # to do this will result in the user having to go into SSH plugin webgui page, stopping and starting SSH in order to 
+  # to do this will result in the user having to go into SSH plugin webgui page, stopping and starting SSH in order to
   # produce the same effect
   cp -f /etc/ssh/sshd_config /boot/config/ssh/sshd_config
 
@@ -581,7 +582,7 @@ ssh_enable()
 {
   echo "Applying Settings ($1) ..."
   sleep 1
-  
+
   SERVICE="$1" #enable
   PORT="$2"
   USERLIST="$3"
@@ -590,10 +591,10 @@ ssh_enable()
   PASSWORDAUTHENTICATION="$6"
   PERMITEMPTYPASSWORDS="$7"
   GATEWAYPORTS="$8"
-  
+
   write_config
   ssh_start
-   
+
   echo "... OK"
   sleep 1
 }
@@ -602,7 +603,7 @@ ssh_disable()
 {
   echo "Applying Settings ($1) ..."
   sleep 1
-  
+
   SERVICE="$1" #disable
   PORT="$2"
   USERLIST="$3"
@@ -611,10 +612,10 @@ ssh_disable()
   PASSWORDAUTHENTICATION="$6"
   PERMITEMPTYPASSWORDS="$7"
   GATEWAYPORTS="$8"
-  
+
   write_config
   ssh_stop
-  
+
   echo "... OK"
   sleep 1
 }
