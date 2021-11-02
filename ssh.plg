@@ -69,6 +69,10 @@ if [ -f /etc/rc.d/rc.&name; ]; then
   rm -f /etc/rc.d/rc.&name;
 fi;
 
+# get a baseline/default sshd_config from bzroot
+mkdir -p /boot/config/plugin/ssh/baseline
+dd if=/boot/bzroot bs=512 skip=$(cpio -ivt -H newc < /boot/bzroot 2>&1 > /dev/null | awk '{print $1}') | xzcat | (cd /boot/config/plugin/ssh/baseline ; cpio -i -d -H newc --no-absolute-filenames etc/ssh/sshd_config )
+
 if [ ! -f /boot/config/plugins/&name;/putty-0.64-$(/usr/bin/uname -m)-1rj.txz ]; then
   NETCHECK=$(timeout 5 wget --no-check-certificate -qST4 --spider &pluginURL; 2>&amp;1 | grep HTTP | tail -1 | cut -f1 | awk '{print $NF}')
   if [ "$NETCHECK" == "OK" ]; then
