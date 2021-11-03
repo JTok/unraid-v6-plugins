@@ -70,15 +70,18 @@ if [ -f /etc/rc.d/rc.&name; ]; then
 fi;
 
 # get a baseline/default sshd_config from bzroot
-mkdir -p /boot/config/plugin/ssh/baseline
-dd if=/boot/bzroot bs=512 skip=$(cpio -ivt -H newc < /boot/bzroot 2>&amp;1 > /dev/null | awk '{print $1}') | xzcat | (cd /boot/config/plugin/ssh/baseline ; cpio -i -d -H newc --no-absolute-filenames etc/ssh/sshd_config )
+mkdir -p /boot/config/plugins/ssh/baseline
+<![CDATA[
+dd if=/boot/bzroot bs=512 skip=$(cpio -ivt -H newc < /boot/bzroot 2>&1 > /dev/null | awk '{print $1}') | xzcat | (cd /boot/config/pluns/ssh/baseline ; cpio -i -d -H newc --no-absolute-filenames etc/ssh/sshd_config )
+]]>
 
-# make setting HOME in /etc/profile contengent on UID less than 1000
-sed -i -e '/^export HOME=\/root$/s/^/[ $(id -u) -lt 1000 ] \&amp;\&amp; /' /etc/profiles
+# make setting HOME in /etc/profile contingent on UID less than 1000
+<![CDATA[
+sed -i -e '/^export HOME=\/root$/s/^/[ $(id -u) -lt 1000 ] \&\& /' /etc/profile
+]]>
 
 # add a group to control user login
 groupadd -f ssh-allow
-
 
 if [ ! -f /boot/config/plugins/&name;/putty-0.64-$(/usr/bin/uname -m)-1rj.txz ]; then
   NETCHECK=$(timeout 5 wget --no-check-certificate -qST4 --spider &pluginURL; 2>&amp;1 | grep HTTP | tail -1 | cut -f1 | awk '{print $NF}')
