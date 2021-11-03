@@ -62,7 +62,6 @@ Plugin file locations:
 
 <FILE Run="/bin/bash" Method="install">
 <INLINE>
-<![CDATA[
 if [ -d /usr/local/emhttp/plugins/&name; ]; then
   rm -r /usr/local/emhttp/plugins/&name;
 fi;
@@ -72,10 +71,10 @@ fi;
 
 # get a baseline/default sshd_config from bzroot
 mkdir -p /boot/config/plugin/ssh/baseline
-dd if=/boot/bzroot bs=512 skip=$(cpio -ivt -H newc < /boot/bzroot 2>&1 > /dev/null | awk '{print $1}') | xzcat | (cd /boot/config/plugin/ssh/baseline ; cpio -i -d -H newc --no-absolute-filenames etc/ssh/sshd_config )
+dd if=/boot/bzroot bs=512 skip=$(cpio -ivt -H newc < /boot/bzroot 2>&amp;1 > /dev/null | awk '{print $1}') | xzcat | (cd /boot/config/plugin/ssh/baseline ; cpio -i -d -H newc --no-absolute-filenames etc/ssh/sshd_config )
 
 # make setting HOME in /etc/profile contengent on UID less than 1000
-sed -i -e '/^export HOME=\/root$/s/^/[ $(id -u) -lt 1000 ] \&\& /' /etc/profiles
+sed -i -e '/^export HOME=\/root$/s/^/[ $(id -u) -lt 1000 ] \&amp;\&amp; /' /etc/profiles
 
 # add a group to control user login
 groupadd -f ssh-allow
@@ -90,7 +89,6 @@ if [ ! -f /boot/config/plugins/&name;/putty-0.64-$(/usr/bin/uname -m)-1rj.txz ];
   fi
 fi
 /sbin/upgradepkg --install-new /boot/config/plugins/&name;/putty-0.64-$(/usr/bin/uname -m)-1rj.txz
-]]>
 </INLINE>
 </FILE>
 
