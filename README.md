@@ -7,30 +7,16 @@ I have made changes that allow both ssh and Denyhosts to work with v6.1.  I cann
 
 The other items will likely be removed from the list below as afaik they are already being supported with Docker containers.
 
-* **Beets**: The purpose of beets is to get your music collection right once and for all. It catalogs your collection, automatically improving its metadata as it goes using the MusicBrainz database. (It also downloads cover art for albums it imports.) Then it provides a bouquet of tools for manipulating and accessing your music.
-
-* **DenyHosts**: Analyzes the sshd server log messages to determine what hosts are attempting to hack into your system. It also determines what user accounts are being targeted. It keeps track of the frequency of attempts from each host. Additionally, upon discovering a repeated attack host, the /etc/hosts.deny file is updated to prevent future break-in attempts from that host. 
-
-* **Dropbox**: Free service that lets you bring all your photos, docs, and videos anywhere. This means that any file you save to your Dropbox will automatically save to all your computers, phones and the Dropbox website.  This plug-in makes it possible to use your UnRAID server as a Dropbox location.
-
-* **NZBGet**: A cross-platform binary newsgrabber for nzb files, written in C++. It supports client/server mode, automatic par-check/-repair and a web-interface. NZBGet requires low system resources making it ideal for running alongside UnRAID.
+* **DenyHosts**: Analyzes the sshd server log messages to determine what hosts are attempting to hack into your system. It also determines what user accounts are being targeted. It keeps track of the frequency of attempts from each host. Additionally, upon discovering a repeated attack host, the /etc/hosts.deny file is updated to prevent future break-in attempts from that host.
 
 * **SSH**: Provides encrypted communication sessions over a computer network using the SSH protocol.  SSH is typically used to log into a remote machine and execute commands, but it also supports tunneling, forwarding TCP ports and it can transfer files using the associated SSH file transfer (SFTP) or secure copy (SCP) protocols.
 
-* **Logitech Media Server (LMS)**: Logitech Media Server (formerly Squeezebox Server, SlimServer and SqueezeCenter) is a streaming audio server supported by Logitech (formerly Slim Devices), developed in particular to support their Squeezebox range of digital audio receivers. Plugin originally developed by Tom (developer of UnRAID) and later enhanced and maintained by Alex R Berg.  My thanks to these and others who have contributed to the plugin as this version would not be possible without their help.<br>
-
-* **pyload**: pyLoad is a fast, lightweight and full featured download manager for many One-Click-Hoster, container formats like DLC, video sites or just plain http/ftp links.
 
 ## Download Links
 Use the following direct links to download each plugin:
 
-NOT PORTED TO 6.1 Beets - (https://raw.githubusercontent.com/overbyrn/unraid-v6-plugins/master/beets.plg)<br>
 DenyHosts - (https://raw.githubusercontent.com/docgyver/unraid-v6-plugins/master/denyhosts.plg)<br>
-NOT PORTED TO 6.1 Dropbox - (https://raw.githubusercontent.com/overbyrn/unraid-v6-plugins/master/dropbox.plg)<br>
-NOT PORTED TO 6.1 NZBGet - (https://raw.githubusercontent.com/overbyrn/unraid-v6-plugins/master/nzbget.plg)<br>
 SSH - (https://raw.githubusercontent.com/docgyver/unraid-v6-plugins/master/ssh.plg)<br>
-NOT PORTED TO 6.1 LMS - (https://raw.githubusercontent.com/overbyrn/unraid-v6-plugins/master/lms.plg)<br>
-NOT PORTED TO 6.1 pyload - (https://raw.githubusercontent.com/overbyrn/unraid-v6-plugins/master/pyload.plg)<br>
 
 ## Installation
 <p>
@@ -52,13 +38,13 @@ When you enter the SSH plug-in, all users are listed and you are able to choose 
 
 ### Configuration Options
 * `Permit Root Login`
-   
-  This option determines if user *root* is enabled for SSH.  NB. Review the other options below as they affect whether root (or other users) can login, depending on the configuration of your users.  eg. password assigned/empty etc. 
-   
+
+  This option determines if user *root* is enabled for SSH.  NB. Review the other options below as they affect whether root (or other users) can login, depending on the configuration of your users.  eg. password assigned/empty etc.
+
 * `Password Authentication`
 
   If this option is set to "no", then it is not possible to login using SSH unless the user has been configured with a public / private key pair. (See ***Creating Key-Pairs*** section)
-  
+
 * `Permit Empty Passwords`
 
   If this option is set to "no" but the user you wish to login with has a blank password, then SSH login will not be possible.  The exception to this is rule is when a user has been configured with a public / private key pair.
