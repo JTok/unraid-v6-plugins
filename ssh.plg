@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "ssh">
 <!ENTITY author     "docgyver">
-<!ENTITY version    "2021.12.01">
+<!ENTITY version    "2021.12.01.1">
 <!ENTITY category   "Network Services">
 <!ENTITY pluginURL  "https://raw.githubusercontent.com/docgyver/unraid-v6-plugins/master/&name;.plg">
 <!ENTITY packageURL "https://github.com/docgyver/unraid-v6-plugins/releases/download/&name;">
