@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "ssh">
 <!ENTITY author     "docgyver">
-<!ENTITY version    "2021.10.30">
+<!ENTITY version    "2021.12.01">
 <!ENTITY category   "Network Services">
 <!ENTITY pluginURL  "https://raw.github.com/docgyver/unraid-v6-plugins/master/&name;.plg">
 <!ENTITY packageURL "https://github.com/docgyver/unraid-v6-plugins/releases/download/&name;">
@@ -72,7 +72,7 @@ fi;
 # get a baseline/default sshd_config from bzroot
 mkdir -p /boot/config/plugins/ssh/baseline
 <![CDATA[
-dd if=/boot/bzroot bs=512 skip=$(cpio -ivt -H newc < /boot/bzroot 2>&1 > /dev/null | awk '{print $1}') | xzcat | (cd /boot/config/pluns/ssh/baseline ; cpio -i -d -H newc --no-absolute-filenames etc/ssh/sshd_config )
+dd if=/boot/bzroot bs=512 skip=$(cpio -ivt -H newc < /boot/bzroot 2>&1 > /dev/null | awk '{print $1}') | xzcat | (cd /boot/config/plugins/ssh/baseline ; cpio -i -d -H newc --no-absolute-filenames etc/ssh/sshd_config )
 ]]>
 
 # make setting HOME in /etc/profile contingent on UID less than 1000
