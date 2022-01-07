@@ -517,6 +517,7 @@ write_config()
   echo "PASSWORDAUTHENTICATION=\"$PASSWORDAUTHENTICATION\"" >> /boot/config/plugins/ssh/ssh.cfg
   echo "PERMITEMPTYPASSWORDS=\"$PERMITEMPTYPASSWORDS\"" >> /boot/config/plugins/ssh/ssh.cfg
   echo "GATEWAYPORTS=\"$GATEWAYPORTS\"" >> /boot/config/plugins/ssh/ssh.cfg
+  sed -i 's/^#\?AllowUsers .*/AllowUsers root'/' /etc/ssh/sshd_config
 
   # only loop thru userlist if some/one were selected in webgui.  no users selected = -1
   if [[ $USERLIST != "-1" ]]; then
