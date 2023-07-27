@@ -3,8 +3,9 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "ssh">
 <!ENTITY author     "docgyver">
-<!ENTITY version    "2022.01.06.1">
+<!ENTITY version    "2023.07.27.1">
 <!ENTITY category   "Network Services">
+<!ENTITY launch     "Settings/&name;">
 <!ENTITY pluginURL  "https://raw.githubusercontent.com/docgyver/unraid-v6-plugins/master/&name;.plg">
 <!ENTITY packageURL "https://github.com/docgyver/unraid-v6-plugins/releases/download/&name;">
 <!ENTITY devplugin  "false">
@@ -13,10 +14,14 @@
 <PLUGIN  name="&name;"
          author="&author;"
          version="&version;"
+         launch="&launch;"
          category="&category;"
          pluginURL="&pluginURL;">
 
 <CHANGES>
+###2023.07.27###
+- Added prohibit-password option to PermitRootLogin
+- BugFix: Fixed Display of Online Version in the UI
 ###2021.10.30###
 - Added code to check for unRaid 6.9 and modify behavior
 ###2019.11.26###
@@ -158,7 +163,7 @@ $ssh_running = file_exists( "/var/run/sshd.pid") ? "yes" : "no";
 $ssh_localplg = shell_exec('grep "<\!ENTITY version" /boot/config/plugins/ssh.plg | cut -d\" -f2');
 
 //Get remote plugin file version.  Uses Limetech plugin php to perform this function
-$ssh_remoteplg = shell_exec("/usr/local/sbin/plugin check ssh.plg | tail -1");
+$ssh_remoteplg = shell_exec("/usr/local/sbin/plugin check ssh.plg | tail -2 | head -1");
 
 //create array of users from passwd file where their UID is greater than or equal to 1000.  ie. assumed to be non-system users
 $useropts = array();
@@ -307,6 +312,7 @@ $sshversion = shell_exec("/usr/bin/ssh -V 2>&1");
       <td>Permit Root Login:</td>
       <td>
         <select name="arg4" id="arg4" size="1">
+          <?=mk_option($ssh_cfg['PERMITROOTLOGIN'], "prohibit-password", "prohibit-password");?>
           <?=mk_option($ssh_cfg['PERMITROOTLOGIN'], "yes", "Yes");?>
           <?=mk_option($ssh_cfg['PERMITROOTLOGIN'], "no", "No");?>
         </select>
@@ -565,7 +571,7 @@ write_config()
   # Pre Unraid 6.9 behavior. Ver6.9+ handles root user .ssh folder
   if [[ $unraid69 != 1 ]]; then
     # check if PermitRootLogin came thru as "YES", in which case check for authorized_keys file in plugin sub-dir.
-    if [[ $PERMITROOTLOGIN = "yes" ]]; then
+    if [[ $PERMITROOTLOGIN != "no" ]]; then
       [ ! -d /root/.ssh ] && mkdir /root/.ssh
       if [ -f /boot/config/plugins/ssh/root/.ssh/authorized_keys ]; then
   	    cp --preserve=timestamps -p /boot/config/plugins/ssh/root/.ssh/authorized_keys /root/.ssh/authorized_keys
