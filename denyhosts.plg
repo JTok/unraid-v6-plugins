@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "denyhosts">
 <!ENTITY author     "docgyver">
-<!ENTITY version    "2018.01.18">
+<!ENTITY version    "2023.08.04">
 <!ENTITY category   "Network Services">
 <!ENTITY pluginURL  "https://raw.github.com/docgyver/unraid-v6-plugins/master/&name;.plg">
 <!ENTITY packageURL "https://github.com/docgyver/unraid-v6-plugins/releases/download/&name;">
@@ -738,21 +738,23 @@ denyhosts_disable()
 
 denyhosts_datacheck()
 {
-  array=( ramfs proc tempfs sysfs )
+  array=( ramfs proc tempfs sysfs tmpfs )
   fs=$( stat -f -c '%T' $WORK_DIR )
   if [ "$fs" = "msdos" ]; then
     echo "<p style="color:red\;"><b>WARNING:</b> Your WORK_DIR is located on your flash drive. This can decrease the life span of your flash device!</p>"
   else
+    found=0
     for i in "${array[@]}"
     do
       if [ $i = $fs ]; then
         echo "<p style="color:red\;"><b>WARNING:</b> Your WORK_DIR is not persistent and WILL NOT survive a reboot. The WORK_DIR maintains a running history of past DenyHosts entries and ideally should be maintained across reboots.  Please locate your WORK_DIR on persistent storage. eg. cache/array disk</p>"
-        break
-      else
-        echo "<p style="color:green\;">WORK_DIR located on persistent storage. Your data will persist after a reboot :-)</p>"
+        found=1
         break
       fi
     done
+    if (( ! $found )) ;then
+        echo "<p style="color:green\;">WORK_DIR located on persistent storage. Your data will persist after a reboot :-)</p>"      
+    fi
   fi
 }
 
