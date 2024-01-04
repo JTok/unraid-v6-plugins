@@ -49,6 +49,12 @@ When you enter the SSH plug-in, all users are listed and you are able to choose 
 
   If this option is set to "no" but the user you wish to login with has a blank password, then SSH login will not be possible.  The exception to this is rule is when a user has been configured with a public / private key pair.
 
+* `Ciphers`
+
+  This option allows you to select the encryption ciphers that are allowed for SSH connections.  The default setting is for this plugin is *blank*. This means that the default ciphers for your system will be used. This option was added to allow workarounds for [CVE-2023-48795](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-48795) while UNRAID is still using an unpatched version of OpenSSH.
+  My recommendation is to set this to `aes128-gcm@openssh.com,aes256-gcm@openssh.com` to be certain that you are not using any of the ciphers that are vulnerable to this exploit.
+  However, if you know what you are doing you can just use `-chacha20-poly1305@openssh.com` (Be sure to include the '-' at the beginning of the string). You will need to make sure you are also not explicitly enabling any `aes(128|192|256)-cbc` ciphers while using the default MACs. See [this link](https://jfrog.com/blog/ssh-protocol-flaw-terrapin-attack-cve-2023-48795-all-you-need-to-know/) for more details.
+
 >**Scenario 1:** you require SSH access for *root*.  *root* already has a password...
 >- Enable option `PermitRootUser`
 >- Enable option `Password Authentication`
@@ -94,7 +100,7 @@ The plug-in has been designed to check for the existance of a public key for eac
 
 ***
 ## Support
-Please provide feedback to any problems encountered or to request enhancements or missing features that you would like to see added.  
+Please provide feedback to any problems encountered or to request enhancements or missing features that you would like to see added.
 
 Support requests should be made in the UnRAID forum. Please use the following thread for all support queries;
 (http://lime-technology.com/forum/index.php?topic=47289.0)<br>
