@@ -51,9 +51,10 @@ When you enter the SSH plug-in, all users are listed and you are able to choose 
 
 * `Ciphers`
 
-  This option allows you to select the encryption ciphers that are allowed for SSH connections.  The default setting is for this plugin is *blank*. This means that the default ciphers for your system will be used. This option was added to allow workarounds for [CVE-2023-48795](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-48795) while UNRAID is still using an unpatched version of OpenSSH.
+  This option allows you to select the encryption ciphers that are allowed for SSH connections. The default setting is for this plugin is *blank*. This means that the default ciphers for the system will be used. This option was added to allow workarounds for [CVE-2023-48795](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-48795) while UNRAID is still using an unpatched version of OpenSSH.
+  This is entirely optional, and whether or not you want to change this setting depends on your threat model.
   My recommendation is to set this to `aes128-gcm@openssh.com,aes256-gcm@openssh.com` to be certain that you are not using any of the ciphers that are vulnerable to this exploit.
-  However, if you know what you are doing you can just use `-chacha20-poly1305@openssh.com` (Be sure to include the '-' at the beginning of the string). You will need to make sure you are also not explicitly enabling any `aes(128|192|256)-cbc` ciphers while using the default MACs. See [this link](https://jfrog.com/blog/ssh-protocol-flaw-terrapin-attack-cve-2023-48795-all-you-need-to-know/) for more details.
+  However, you could also just set it to `-chacha20-poly1305@openssh.com` (be certain to include the '-' at the beginning of the string). You will need to make sure you are also not enabling any `aes(128|192|256)-cbc` ciphers while using the default MACs. See [this link](https://jfrog.com/blog/ssh-protocol-flaw-terrapin-attack-cve-2023-48795-all-you-need-to-know/) for more details.
 
 >**Scenario 1:** you require SSH access for *root*.  *root* already has a password...
 >- Enable option `PermitRootUser`
